@@ -17,7 +17,7 @@ type Team struct {
 	City           string     `json:"city" gorm:"type:varchar(100)"`
 	State          string     `json:"state" gorm:"type:varchar(50)"`
 	FoundationDate *time.Time `json:"foundation_date" gorm:"type:date"`
-	Badge          string     `json:"badge" gorm:"type:varchar(255)"`
+	Badge          string     `json:"badge" gorm:"type:varchar(255)"` //emblema
 	Description    string     `json:"description" gorm:"type:text"`
 }
 

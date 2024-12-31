@@ -40,9 +40,12 @@ func ConnectDatabase() {
 		&models.GameStatistics{},
 	)
 
-	// // Executar o seed de dados
-	// if err := SeedDatabase(); err != nil {
-	// 	log.Fatal("Falha ao preencher o banco de dados:", err)
+	// if err := SeedLigas(DB); err != nil {
+	// 	log.Fatalf("Erro ao executar seed: %v", err)
+	// }
+
+	// if err := SeedTeams(DB); err != nil {
+	// 	log.Fatalf("Erro ao executar seed: %v", err)
 	// }
 
 }

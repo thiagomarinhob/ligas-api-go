@@ -56,17 +56,6 @@ func main() {
 	// Swagger route
 	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// if len(os.Args) > 1 && os.Args[1] == "seed" {
-	// 	fmt.Println("Executando o seed do banco de dados...")
-	// 	if err := database.SeedDatabase(); err != nil {
-	// 		fmt.Printf("Erro ao executar o seed: %v\n", err)
-	// 		os.Exit(1)
-	// 	} else {
-	// 		fmt.Println("Seed executado com sucesso!")
-	// 		os.Exit(0)
-	// 	}
-	// }
-
 	// Iniciar o servidor
 	server.Run(":8080")
 }
