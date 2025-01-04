@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"fmt"
 	"go-api-ligas/models"
 	"go-api-ligas/repository"
 	"sort"
@@ -75,13 +74,16 @@ func GetLeagueStandings(leagueID string) ([]map[string]interface{}, error) {
 		return nil, err
 	}
 
-	fmt.Println("times e games", teams, games)
-
 	// Mapa para armazenar vitórias e derrotas
 	standings := make(map[string]map[string]interface{})
 	for _, team := range teams {
 		standings[team.ID] = map[string]interface{}{
-			"Team":          team,
+			"Team": map[string]interface{}{
+				"id":      team.ID,
+				"name":    team.Name,
+				"acronym": team.Acronym,
+				"badge":   team.Badge,
+			},
 			"Points":        0,
 			"Wins":          0,
 			"Losses":        0,

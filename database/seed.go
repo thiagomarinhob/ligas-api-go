@@ -2,7 +2,6 @@ package database
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
 	"time"
 
@@ -141,137 +140,96 @@ func SeedAll(db *gorm.DB) error {
 		return err
 	}
 
-	teams := []models.Team{
-		{
-			ID:             uuid.New().String(),
-			Name:           "ABA Apuiares",
-			Acronym:        "ABA",
-			LeagueID:       leagueID,
-			City:           "Apuiarés",
-			State:          "Ceará",
-			FoundationDate: nil,
-			Badge:          "",
-			Description:    "ABA Apuiarés",
-		},
-		{
-			ID:             uuid.New().String(),
-			Name:           "São Goncalo do Amarante",
-			Acronym:        "SGA",
-			LeagueID:       leagueID,
-			City:           "São Goncalo do Amarante",
-			State:          "Ceará",
-			FoundationDate: nil,
-			Badge:          "",
-			Description:    "São Goncalo do Amarante",
-		},
-		{
-			ID:             uuid.New().String(),
-			Name:           "Universidade Federal do Ceará",
-			Acronym:        "UFC",
-			LeagueID:       leagueID,
-			City:           "Universidade Federal do Ceará",
-			State:          "Ceará",
-			FoundationDate: nil,
-			Badge:          "",
-			Description:    "Universidade Federal do Ceará",
-		},
-		{
-			ID:             uuid.New().String(),
-			Name:           "Kalangos",
-			Acronym:        "KLG",
-			LeagueID:       leagueID,
-			City:           "Kalangos",
-			State:          "Ceará",
-			FoundationDate: nil,
-			Badge:          "",
-			Description:    "Kalangos",
-		},
-		{
-			ID:             uuid.New().String(),
-			Name:           "DMB",
-			Acronym:        "DMB",
+	teamsIDs := []string{}
+	for i := 1; i <= 11; i++ {
+		teamID := uuid.NewString()
+		team := models.Team{
+			ID:             teamID,
+			Name:           fmt.Sprintf("Time %d", i),
+			Acronym:        fmt.Sprintf("TM%d", i),
 			LeagueID:       leagueID,
 			City:           "Fortaleza",
 			State:          "Ceará",
 			FoundationDate: nil,
 			Badge:          "",
-			Description:    "Kalangos",
-		},
-		{
-			ID:             uuid.New().String(),
-			Name:           "Henrique Jorge",
-			Acronym:        "HJB",
-			LeagueID:       leagueID,
-			City:           "Fortaleza",
-			State:          "Ceará",
-			FoundationDate: nil,
-			Badge:          "",
-			Description:    "Henrique Jorge",
-		},
-		{
-			ID:             uuid.New().String(),
-			Name:           "Info Digital",
-			Acronym:        "IFD",
-			LeagueID:       leagueID,
-			City:           "Rio Grande do Norte",
-			State:          "RN",
-			FoundationDate: nil,
-			Badge:          "",
-			Description:    "Info Digital",
-		},
-		{
-			ID:             uuid.New().String(),
-			Name:           "5 shots",
-			Acronym:        "5SH",
-			LeagueID:       leagueID,
-			City:           "Fortaleza",
-			State:          "Ceará",
-			FoundationDate: nil,
-			Badge:          "",
-			Description:    "5 Shots",
-		},
-	}
+			Description:    fmt.Sprintf("Time %d", i),
+		}
 
-	for _, team := range teams {
-		// Adiciona a liga apenas se ela não existir no banco
-		if err := db.FirstOrCreate(&team, models.League{ID: team.ID}).Error; err != nil {
+		teamsIDs = append(teamsIDs, teamID)
+		if err := db.FirstOrCreate(&team).Error; err != nil {
 			return err
+		}
+
+		for j := 1; j <= 10; j++ {
+			player := models.Player{
+				ID:        uuid.NewString(),
+				Name:      fmt.Sprintf("Jogador%dT%d", j, i),
+				Number:    j,
+				TeamID:    teamID,
+				Position:  "Armador",
+				Height:    1.80,
+				Weight:    80,
+				BirthDate: func(t time.Time) *time.Time { return &t }(time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC)),
+				Photo:     "",
+			}
+
+			if err := db.FirstOrCreate(&player).Error; err != nil {
+				return err
+			}
 		}
 	}
 
-	// Criar jogos
-	// rand.Seed(time.Now().UnixNano()) // Inicializa a seed para gerar números aleatórios
-	games := []models.Game{}
-	// leagueID := teams[0].LeagueID // Assumindo que todos os times pertencem à mesma liga
-
-	for i := 0; i < len(teams); i++ {
-		for j := i + 1; j < len(teams); j++ { // Evita duplicar jogos entre as mesmas equipes
+	// Cria os jogos entre as equipes
+	gameIDs := []string{}
+	for i := 0; i < len(teamsIDs); i++ {
+		for j := i + 1; j < len(teamsIDs); j++ { // Evita duplicar jogos entre as mesmas equipes
+			gameID := uuid.New().String()
 			game := models.Game{
-				ID:          uuid.NewString(),
+				ID:          gameID,
 				LeagueID:    leagueID,
-				TeamAID:     teams[i].ID,
-				TeamBID:     teams[j].ID,
+				TeamAID:     teamsIDs[i],
+				TeamBID:     teamsIDs[j],
 				DateTime:    time.Now().AddDate(0, 0, rand.Intn(30)), // Data aleatória nos próximos 30 dias
-				Location:    "Estádio " + teams[i].Name + " x " + teams[j].Name,
-				PointsTeamA: rand.Intn(10), // Pontuação aleatória para Team A (0 a 9)
-				PointsTeamB: rand.Intn(10), // Pontuação aleatória para Team B (0 a 9)
+				Location:    "Estádio " + teamsIDs[i] + " x " + teamsIDs[j],
+				PointsTeamA: rand.Intn(100), // Pontuação aleatória para Team A (0 a 9)
+				PointsTeamB: rand.Intn(100), // Pontuação aleatória para Team B (0 a 9)
 				Status:      "completed",
 				Description: "Jogo gerado automaticamente.",
 			}
-			games = append(games, game)
-			// fmt.Println("Foram criados jogos entre os times.", game)
+			gameIDs = append(gameIDs, gameID)
+			if err := db.FirstOrCreate(&game).Error; err != nil {
+				return err
+			}
 		}
 	}
 
-	fmt.Println("Jogos que seram salvos.", len(games))
+	// Criação de estatísticas para cada jogador em cada jogo
+	for _, gameID := range gameIDs {
+		for _, teamID := range teamsIDs {
+			var players []models.Player
+			if err := db.Where("team_id = ?", teamID).Find(&players).Error; err != nil {
+				return err
+			}
 
-	for _, game := range games {
-		if err := db.FirstOrCreate(&game).Error; err != nil {
-			return err
+			for _, player := range players {
+				stats := models.GameStatistics{
+					ID:            uuid.New().String(),
+					GameID:        gameID,
+					PlayerID:      player.ID,
+					Points:        rand.Intn(15), // Valor fixo ou gerado aleatoriamente
+					Rebounds:      rand.Intn(7),
+					Assists:       rand.Intn(10),
+					Steals:        rand.Intn(6),
+					Blocks:        rand.Intn(3),
+					Fouls:         rand.Intn(5),
+					MinutesPlayed: rand.Float32() * 40, // Minutos jogados (0 a 40)
+				}
+				if err := db.Create(&stats).Error; err != nil {
+					return err
+				}
+			}
 		}
 	}
-
-	log.Printf("Foram criados %d jogos entre os times.", len(games))
 
 	return nil
 }
