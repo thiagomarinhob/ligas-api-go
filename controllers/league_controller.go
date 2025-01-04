@@ -85,3 +85,15 @@ func DeleteLeague(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "League deleted successfully"})
 }
+
+func GetLeagueStandings(c *gin.Context) {
+	id := c.Param("id")
+
+	standings, err := services.GetLeagueStandings(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, standings)
+}

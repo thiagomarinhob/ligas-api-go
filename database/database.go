@@ -40,6 +40,10 @@ func ConnectDatabase() {
 		&models.GameStatistics{},
 	)
 
+	if err := SeedAll(DB); err != nil {
+		log.Fatalf("Erro ao executar seed: %v", err)
+	}
+
 	// if err := SeedLigas(DB); err != nil {
 	// 	log.Fatalf("Erro ao executar seed: %v", err)
 	// }

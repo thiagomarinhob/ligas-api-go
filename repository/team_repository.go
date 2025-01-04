@@ -17,7 +17,7 @@ func GetTeams() ([]models.Team, error) {
 
 func GetTeamByID(id string) (models.Team, error) {
 	var team models.Team
-	err := database.DB.Preload("League").First(&team, "id = ?", id).Error
+	err := database.DB.First(&team, "id = ?", id).Error
 	return team, err
 }
 

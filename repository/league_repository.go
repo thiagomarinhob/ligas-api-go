@@ -33,3 +33,20 @@ func UpdateLeague(id string, updates map[string]interface{}) (models.League, err
 func DeleteLeague(id string) error {
 	return database.DB.Delete(&models.League{}, "id = ?", id).Error
 }
+
+func GetTeamsAndGamesByLeagueID(leagueID string) ([]models.Team, []models.Game, error) {
+	var teams []models.Team
+	var games []models.Game
+
+	// Buscar times da liga
+	if err := database.DB.Where("league_id = ?", leagueID).Find(&teams).Error; err != nil {
+		return nil, nil, err
+	}
+
+	// Buscar jogos concluídos da liga
+	if err := database.DB.Where("league_id = ? AND status = ?", leagueID, "completed").Find(&games).Error; err != nil {
+		return nil, nil, err
+	}
+
+	return teams, games, nil
+}
