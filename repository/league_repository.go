@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"go-api-ligas/database"
 	"go-api-ligas/models"
 )
@@ -49,4 +50,35 @@ func GetTeamsAndGamesByLeagueID(leagueID string) ([]models.Team, []models.Game, 
 	}
 
 	return teams, games, nil
+}
+
+type PlayerStatistics struct {
+	PlayerID    string `json:"player_id"`
+	PlayerName  string `json:"player_name"`
+	TotalPoints int    `json:"total_points"`
+}
+
+func GetTotalPointsRanking(leagueID string, limit int) ([]PlayerStatistics, error) {
+
+	// Query SQL para buscar o ranking
+	const query = `
+		SELECT 
+			gs.player_id,
+			p.name AS player_name,
+			SUM(gs.points) AS total_points
+		FROM game_statistics gs
+		JOIN players p ON gs.player_id = p.id
+		JOIN teams t ON p.team_id = t.id
+		WHERE t.league_id = ?
+		GROUP BY gs.player_id, p.name
+		ORDER BY total_points DESC
+		LIMIT ?`
+
+	// Executar a query
+	var topScorers []PlayerStatistics
+	if err := database.DB.Raw(query, leagueID, limit).Scan(&topScorers).Error; err != nil {
+		return nil, fmt.Errorf("erro ao buscar ranking de pontos: %w", err)
+	}
+
+	return topScorers, nil
 }

@@ -3,6 +3,7 @@ package controllers
 import (
 	"go-api-ligas/services"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -96,4 +97,23 @@ func GetLeagueStandings(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, standings)
+}
+
+func GetTotalPointsRanking(c *gin.Context) {
+	id := c.Param("id")
+	limitParam := c.Param("limit")
+
+	limit, err := strconv.Atoi(limitParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit parameter"})
+		return
+	}
+
+	ranking, err := services.GetTotalPointsRanking(id, limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, ranking)
 }

@@ -135,3 +135,15 @@ func GetLeagueStandings(leagueID string) ([]map[string]interface{}, error) {
 
 	return result, nil
 }
+
+func GetTotalPointsRanking(leagueID string, limit int) ([]repository.PlayerStatistics, error) {
+	if leagueID == "" {
+		return nil, errors.New("league ID is required")
+	}
+
+	if limit == 0 {
+		limit = 10
+	}
+
+	return repository.GetTotalPointsRanking(leagueID, limit)
+}
