@@ -12,6 +12,7 @@ func CreateGameStatistics(c *gin.Context) {
 		GameID        string  `json:"game_id"`
 		PlayerID      string  `json:"player_id"`
 		Points        int     `json:"points"`
+		ThreePoints   int     `json:"three_points"`
 		Rebounds      int     `json:"rebounds"`
 		Assists       int     `json:"assists"`
 		Steals        int     `json:"steals"`

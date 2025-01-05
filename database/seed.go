@@ -217,6 +217,7 @@ func SeedAll(db *gorm.DB) error {
 					GameID:        gameID,
 					PlayerID:      player.ID,
 					Points:        rand.Intn(15), // Valor fixo ou gerado aleatoriamente
+					ThreePoints:   rand.Intn(10),
 					Rebounds:      rand.Intn(7),
 					Assists:       rand.Intn(10),
 					Steals:        rand.Intn(6),

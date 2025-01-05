@@ -82,3 +82,34 @@ func GetTotalPointsRanking(leagueID string, limit int) ([]PlayerStatistics, erro
 
 	return topScorers, nil
 }
+
+type PlayerThreePointsStatistics struct {
+	PlayerID    string `json:"player_id"`
+	PlayerName  string `json:"player_name"`
+	ThreePoints int    `json:"three_points"`
+}
+
+func GetTotalThreePointsRanking(leagueID string, limit int) ([]PlayerThreePointsStatistics, error) {
+
+	// Query SQL para buscar o ranking
+	const query = `
+		SELECT 
+			gs.player_id,
+			p.name AS player_name,
+			SUM(gs.three_points) AS three_points
+		FROM game_statistics gs
+		JOIN players p ON gs.player_id = p.id
+		JOIN teams t ON p.team_id = t.id
+		WHERE t.league_id = ?
+		GROUP BY gs.player_id, p.name
+		ORDER BY three_points DESC
+		LIMIT ?`
+
+	// Executar a query
+	var topScorers []PlayerThreePointsStatistics
+	if err := database.DB.Raw(query, leagueID, limit).Scan(&topScorers).Error; err != nil {
+		return nil, fmt.Errorf("erro ao buscar ranking de pontos: %w", err)
+	}
+
+	return topScorers, nil
+}

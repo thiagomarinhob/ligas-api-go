@@ -25,6 +25,7 @@ func SetupRoutes(router *gin.Engine) {
 			leagueGroup.GET("/", controllers.GetLeagues)
 			leagueGroup.GET("/:id", controllers.GetLeagueByID)
 			leagueGroup.GET("/:id/ranking-points/:limit", controllers.GetTotalPointsRanking)
+			leagueGroup.GET("/:id/ranking-three-points/:limit", controllers.GetTotalThreePointsRanking)
 			leagueGroup.GET("/:id/standings", controllers.GetLeagueStandings)
 			leagueGroup.PUT("/:id", controllers.UpdateLeague)
 			leagueGroup.DELETE("/:id", controllers.DeleteLeague)

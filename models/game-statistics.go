@@ -12,6 +12,7 @@ type GameStatistics struct {
 	PlayerID      string  `json:"player_id" gorm:"not null"` // Foreign key for Player
 	Player        Player  `json:"player" gorm:"foreignKey:PlayerID;constraint:OnDelete:CASCADE;"`
 	Points        int     `json:"points" gorm:"default:0"`
+	ThreePoints   int     `json:"three_points" gorm:"default:0"` // Novo campo
 	Rebounds      int     `json:"rebounds" gorm:"default:0"`
 	Assists       int     `json:"assists" gorm:"default:0"`
 	Steals        int     `json:"steals" gorm:"default:0"`

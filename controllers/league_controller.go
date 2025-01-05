@@ -117,3 +117,22 @@ func GetTotalPointsRanking(c *gin.Context) {
 
 	c.JSON(http.StatusOK, ranking)
 }
+
+func GetTotalThreePointsRanking(c *gin.Context) {
+	id := c.Param("id")
+	limitParam := c.Param("limit")
+
+	limit, err := strconv.Atoi(limitParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit parameter"})
+		return
+	}
+
+	ranking, err := services.GetTotalThreePointsRanking(id, limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, ranking)
+}

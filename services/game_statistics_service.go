@@ -9,6 +9,7 @@ func CreateGameStatistics(input struct {
 	GameID        string  `json:"game_id"`
 	PlayerID      string  `json:"player_id"`
 	Points        int     `json:"points"`
+	ThreePoints   int     `json:"three_points"`
 	Rebounds      int     `json:"rebounds"`
 	Assists       int     `json:"assists"`
 	Steals        int     `json:"steals"`
@@ -20,6 +21,7 @@ func CreateGameStatistics(input struct {
 		GameID:        input.GameID,
 		PlayerID:      input.PlayerID,
 		Points:        input.Points,
+		ThreePoints:   input.ThreePoints,
 		Rebounds:      input.Rebounds,
 		Assists:       input.Assists,
 		Steals:        input.Steals,

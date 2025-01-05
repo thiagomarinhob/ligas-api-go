@@ -147,3 +147,15 @@ func GetTotalPointsRanking(leagueID string, limit int) ([]repository.PlayerStati
 
 	return repository.GetTotalPointsRanking(leagueID, limit)
 }
+
+func GetTotalThreePointsRanking(leagueID string, limit int) ([]repository.PlayerThreePointsStatistics, error) {
+	if leagueID == "" {
+		return nil, errors.New("league ID is required")
+	}
+
+	if limit == 0 {
+		limit = 10
+	}
+
+	return repository.GetTotalThreePointsRanking(leagueID, limit)
+}
