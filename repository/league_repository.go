@@ -10,34 +10,45 @@ func CreateLeague(league *models.League) error {
 	return database.DB.Create(league).Error
 }
 
-func GetLeagues() ([]models.League, error) {
+// GetLeagues retorna todas as ligas associadas a um usuário específico
+func GetLeagues(userID string) ([]models.League, error) {
 	var leagues []models.League
-	err := database.DB.Find(&leagues).Error
+	err := database.DB.Where("user_id = ?", userID).Find(&leagues).Error
 	return leagues, err
 }
 
-func GetLeagueByID(id string) (models.League, error) {
+// GetLeagueByID retorna uma liga específica pelo ID, desde que pertença ao usuário
+func GetLeagueByID(userID, leagueID string) (models.League, error) {
 	var league models.League
-	err := database.DB.First(&league, "id = ?", id).Error
+	err := database.DB.Where("id = ? AND user_id = ?", leagueID, userID).First(&league).Error
 	return league, err
 }
 
-func UpdateLeague(id string, updates map[string]interface{}) (models.League, error) {
+// UpdateLeague atualiza uma liga específica, desde que pertença ao usuário
+func UpdateLeague(userID, leagueID string, updates map[string]interface{}) (models.League, error) {
 	var league models.League
-	if err := database.DB.Model(&league).Where("id = ?", id).Updates(updates).Error; err != nil {
+	if err := database.DB.Model(&league).Where("id = ? AND user_id = ?", leagueID, userID).Updates(updates).Error; err != nil {
 		return models.League{}, err
 	}
-	database.DB.First(&league, "id = ?", id)
+	database.DB.First(&league, "id = ? AND user_id = ?", leagueID, userID)
 	return league, nil
 }
 
-func DeleteLeague(id string) error {
-	return database.DB.Delete(&models.League{}, "id = ?", id).Error
+// DeleteLeague deleta uma liga específica, desde que pertença ao usuário
+func DeleteLeague(userID, leagueID string) error {
+	return database.DB.Delete(&models.League{}, "id = ? AND user_id = ?", leagueID, userID).Error
 }
 
-func GetTeamsAndGamesByLeagueID(leagueID string) ([]models.Team, []models.Game, error) {
+// GetTeamsAndGamesByLeagueID retorna times e jogos de uma liga específica, desde que pertença ao usuário
+func GetTeamsAndGamesByLeagueID(userID, leagueID string) ([]models.Team, []models.Game, error) {
 	var teams []models.Team
 	var games []models.Game
+
+	// Verifica se a liga pertence ao usuário
+	var league models.League
+	if err := database.DB.Where("id = ? AND user_id = ?", leagueID, userID).First(&league).Error; err != nil {
+		return nil, nil, err
+	}
 
 	// Buscar times da liga
 	if err := database.DB.Where("league_id = ?", leagueID).Find(&teams).Error; err != nil {
@@ -58,7 +69,13 @@ type PlayerStatistics struct {
 	TotalPoints int    `json:"total_points"`
 }
 
-func GetTotalPointsRanking(leagueID string, limit int) ([]PlayerStatistics, error) {
+// GetTotalPointsRanking retorna o ranking de pontos de uma liga específica, desde que pertença ao usuário
+func GetTotalPointsRanking(userID, leagueID string, limit int) ([]PlayerStatistics, error) {
+	// Verifica se a liga pertence ao usuário
+	var league models.League
+	if err := database.DB.Where("id = ? AND user_id = ?", leagueID, userID).First(&league).Error; err != nil {
+		return nil, err
+	}
 
 	// Query SQL para buscar o ranking
 	const query = `
@@ -89,7 +106,13 @@ type PlayerThreePointsStatistics struct {
 	ThreePoints int    `json:"three_points"`
 }
 
-func GetTotalThreePointsRanking(leagueID string, limit int) ([]PlayerThreePointsStatistics, error) {
+// GetTotalThreePointsRanking retorna o ranking de pontos de três de uma liga específica, desde que pertença ao usuário
+func GetTotalThreePointsRanking(userID, leagueID string, limit int) ([]PlayerThreePointsStatistics, error) {
+	// Verifica se a liga pertence ao usuário
+	var league models.League
+	if err := database.DB.Where("id = ? AND user_id = ?", leagueID, userID).First(&league).Error; err != nil {
+		return nil, err
+	}
 
 	// Query SQL para buscar o ranking
 	const query = `

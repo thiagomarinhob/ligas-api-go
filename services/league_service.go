@@ -51,25 +51,36 @@ func CreateLeague(input struct {
 	return league, err
 }
 
-func GetLeagues() ([]models.League, error) {
-	return repository.GetLeagues()
+// GetLeagues retorna todas as ligas associadas a um usuário específico
+func GetLeagues(userID string) ([]models.League, error) {
+	return repository.GetLeagues(userID)
 }
 
-func GetLeagueByID(id string) (models.League, error) {
-	return repository.GetLeagueByID(id)
+// GetLeagueByID retorna uma liga específica pelo ID, desde que pertença ao usuário
+func GetLeagueByID(userID, leagueID string) (models.League, error) {
+	return repository.GetLeagueByID(userID, leagueID)
 }
 
-func UpdateLeague(id string, updates map[string]interface{}) (models.League, error) {
-	return repository.UpdateLeague(id, updates)
+// UpdateLeague atualiza uma liga específica, desde que pertença ao usuário
+func UpdateLeague(userID, leagueID string, updates map[string]interface{}) (models.League, error) {
+	return repository.UpdateLeague(userID, leagueID, updates)
 }
 
-func DeleteLeague(id string) error {
-	return repository.DeleteLeague(id)
+// DeleteLeague deleta uma liga específica, desde que pertença ao usuário
+func DeleteLeague(userID, leagueID string) error {
+	return repository.DeleteLeague(userID, leagueID)
 }
 
-func GetLeagueStandings(leagueID string) ([]map[string]interface{}, error) {
+// GetLeagueStandings retorna a classificação de uma liga específica, desde que pertença ao usuário
+func GetLeagueStandings(userID, leagueID string) ([]map[string]interface{}, error) {
+	// Verifica se a liga pertence ao usuário
+	_, err := repository.GetLeagueByID(userID, leagueID)
+	if err != nil {
+		return nil, err
+	}
+
 	// Buscar times e jogos associados à liga
-	teams, games, err := repository.GetTeamsAndGamesByLeagueID(leagueID)
+	teams, games, err := repository.GetTeamsAndGamesByLeagueID(userID, leagueID)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +147,8 @@ func GetLeagueStandings(leagueID string) ([]map[string]interface{}, error) {
 	return result, nil
 }
 
-func GetTotalPointsRanking(leagueID string, limit int) ([]repository.PlayerStatistics, error) {
+// GetTotalPointsRanking retorna o ranking de pontos de uma liga específica, desde que pertença ao usuário
+func GetTotalPointsRanking(userID, leagueID string, limit int) ([]repository.PlayerStatistics, error) {
 	if leagueID == "" {
 		return nil, errors.New("league ID is required")
 	}
@@ -145,10 +157,17 @@ func GetTotalPointsRanking(leagueID string, limit int) ([]repository.PlayerStati
 		limit = 10
 	}
 
-	return repository.GetTotalPointsRanking(leagueID, limit)
+	// Verifica se a liga pertence ao usuário
+	_, err := repository.GetLeagueByID(userID, leagueID)
+	if err != nil {
+		return nil, err
+	}
+
+	return repository.GetTotalPointsRanking(userID, leagueID, limit)
 }
 
-func GetTotalThreePointsRanking(leagueID string, limit int) ([]repository.PlayerThreePointsStatistics, error) {
+// GetTotalThreePointsRanking retorna o ranking de pontos de três de uma liga específica, desde que pertença ao usuário
+func GetTotalThreePointsRanking(userID, leagueID string, limit int) ([]repository.PlayerThreePointsStatistics, error) {
 	if leagueID == "" {
 		return nil, errors.New("league ID is required")
 	}
@@ -157,5 +176,11 @@ func GetTotalThreePointsRanking(leagueID string, limit int) ([]repository.Player
 		limit = 10
 	}
 
-	return repository.GetTotalThreePointsRanking(leagueID, limit)
+	// Verifica se a liga pertence ao usuário
+	_, err := repository.GetLeagueByID(userID, leagueID)
+	if err != nil {
+		return nil, err
+	}
+
+	return repository.GetTotalThreePointsRanking(userID, leagueID, limit)
 }

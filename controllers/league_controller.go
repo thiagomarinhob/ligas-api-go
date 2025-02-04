@@ -27,6 +27,16 @@ func CreateLeague(c *gin.Context) {
 		return
 	}
 
+	// Extrair o userID do header
+	userID := c.GetHeader("User-ID")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User-ID header is required"})
+		return
+	}
+
+	// Associar o userID ao input
+	input.UserID = userID
+
 	league, err := services.CreateLeague(input)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -37,7 +47,14 @@ func CreateLeague(c *gin.Context) {
 }
 
 func GetLeagues(c *gin.Context) {
-	leagues, err := services.GetLeagues()
+	// Extrair o userID do header
+	userID := c.GetHeader("User-ID")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User-ID header is required"})
+		return
+	}
+
+	leagues, err := services.GetLeagues(userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -47,9 +64,16 @@ func GetLeagues(c *gin.Context) {
 }
 
 func GetLeagueByID(c *gin.Context) {
+	// Extrair o userID do header
+	userID := c.GetHeader("User-ID")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User-ID header is required"})
+		return
+	}
+
 	id := c.Param("id")
 
-	league, err := services.GetLeagueByID(id)
+	league, err := services.GetLeagueByID(userID, id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -59,6 +83,13 @@ func GetLeagueByID(c *gin.Context) {
 }
 
 func UpdateLeague(c *gin.Context) {
+	// Extrair o userID do header
+	userID := c.GetHeader("User-ID")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User-ID header is required"})
+		return
+	}
+
 	id := c.Param("id")
 	var input map[string]interface{}
 
@@ -67,7 +98,7 @@ func UpdateLeague(c *gin.Context) {
 		return
 	}
 
-	league, err := services.UpdateLeague(id, input)
+	league, err := services.UpdateLeague(userID, id, input)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -77,9 +108,16 @@ func UpdateLeague(c *gin.Context) {
 }
 
 func DeleteLeague(c *gin.Context) {
+	// Extrair o userID do header
+	userID := c.GetHeader("User-ID")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User-ID header is required"})
+		return
+	}
+
 	id := c.Param("id")
 
-	if err := services.DeleteLeague(id); err != nil {
+	if err := services.DeleteLeague(userID, id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -88,9 +126,16 @@ func DeleteLeague(c *gin.Context) {
 }
 
 func GetLeagueStandings(c *gin.Context) {
+	// Extrair o userID do header
+	userID := c.GetHeader("User-ID")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User-ID header is required"})
+		return
+	}
+
 	id := c.Param("id")
 
-	standings, err := services.GetLeagueStandings(id)
+	standings, err := services.GetLeagueStandings(userID, id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -100,8 +145,15 @@ func GetLeagueStandings(c *gin.Context) {
 }
 
 func GetTotalPointsRanking(c *gin.Context) {
+	// Extrair o userID do header
+	userID := c.GetHeader("User-ID")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User-ID header is required"})
+		return
+	}
+
 	id := c.Param("id")
-	limitParam := c.Param("limit")
+	limitParam := c.DefaultQuery("limit", "10") // Usar query parameter para o limite
 
 	limit, err := strconv.Atoi(limitParam)
 	if err != nil {
@@ -109,7 +161,7 @@ func GetTotalPointsRanking(c *gin.Context) {
 		return
 	}
 
-	ranking, err := services.GetTotalPointsRanking(id, limit)
+	ranking, err := services.GetTotalPointsRanking(userID, id, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -119,8 +171,15 @@ func GetTotalPointsRanking(c *gin.Context) {
 }
 
 func GetTotalThreePointsRanking(c *gin.Context) {
+	// Extrair o userID do header
+	userID := c.GetHeader("User-ID")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User-ID header is required"})
+		return
+	}
+
 	id := c.Param("id")
-	limitParam := c.Param("limit")
+	limitParam := c.DefaultQuery("limit", "10") // Usar query parameter para o limite
 
 	limit, err := strconv.Atoi(limitParam)
 	if err != nil {
@@ -128,7 +187,7 @@ func GetTotalThreePointsRanking(c *gin.Context) {
 		return
 	}
 
-	ranking, err := services.GetTotalThreePointsRanking(id, limit)
+	ranking, err := services.GetTotalThreePointsRanking(userID, id, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
